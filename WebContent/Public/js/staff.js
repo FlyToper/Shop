@@ -1,52 +1,26 @@
 // 员工信息修改按钮事件
 function update() {
 	//alert("123ss");
+	$(".txtCanEdit").removeAttr("readonly");
+	$(".txtCanEdit").removeClass("myHideUpdateInput");
+	$(".txtCanEdit").addClass("myUpdateInput");
 	
-	$("#txtName").css("border", "solid");
-	$("#txtName").removeAttr("readonly");
-	
-	$("#txtEmail").css("border", "solid");
-	$("#txtEmail").removeAttr("readonly");
-	
-	$("#txtPhone").css("border", "solid");
-	$("#txtPhone").removeAttr("readonly");
-	
-	$("#txtGender").css("border", "solid");
-	$("#txtGender").removeAttr("readonly");
-	
-	//
 	$("#div_update").css("display","none");
 	//$("#div_update").addClass("myHide");
-//	
-	$("#div_save").css("display","inline");
-	//$("#div_save").addClass("myShow");
 	
-	//$(".canEdit").css("display","inline");
+	$("#div_save").css("display","inline");
+
 }
 
-function changeCSS(id, className){
-	//alert(id+"===="+className);
-	$("#txtN").removeAttr("readonly");
-	$(id).addClass("myUpdateInput");
-	
-}
 
 //员工信息修改取消按钮事件
 function updateCancel() { 
 	
-	$("#txtName").attr("readonly", "readonly");
-	$("#txtName").css("border", "none");
+	$(".txtCanEdit").attr("readonly","readonly");
+	$(".txtCanEdit").removeClass("myUpdateInput");
+	$(".txtCanEdit").addClass("myHideUpdateInput");
 	
-	$("#txtEmail").attr("readonly", "readonly");
-	$("#txtEmail").css("border", "none");
 	
-	$("#txtPhone").attr("readonly", "readonly");
-	$("#txtPhone").css("border", "none");
-	
-	$("#txtGender").attr("readonly", "readonly");
-	$("#txtGender").css("border", "none");
-	
-	//
 	$("#div_update").css("display","inline");
 	$("#div_save").css("display","none");
 	
@@ -68,7 +42,7 @@ function save(){
 					//全部验证完成，可以执行提交
 					$.post("./HomeController", {"UserName":UserName,"Email":Email , "Gender":Gender, "Phone":Phone ,"a":"UpdateStaffInfo"}, function(rst){
 						if(rst == "success"){
-							alert("保存成功！");
+							//alert("保存成功！");
 							window.location.href="./HomeController";
 						}else{
 							alert("修改失败，请重试！");

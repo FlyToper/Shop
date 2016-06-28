@@ -324,7 +324,7 @@ public class HomeController extends Controller {
 		System.out.println("数据访问成功，返回");
 		myRequest.setAttribute("goodsInfoArr", goodsInfoArr);
 		//跳转到商品销售页
-		RequestDispatcher dispatcher = myRequest.getRequestDispatcher("WEB-INF/View/goodsImport123.jsp");
+		RequestDispatcher dispatcher = myRequest.getRequestDispatcher("WEB-INF/View/Home/GoodsImport.jsp");
 		dispatcher.forward(myRequest, myResponse);
 
 	}

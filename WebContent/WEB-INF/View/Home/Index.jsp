@@ -11,28 +11,17 @@
 
 <link href="./Public/css/bootstrap.min.css" rel="stylesheet"
 	type="text/css" />
+<link href="./Public/css/index.css" rel="stylesheet" type="text/css" />
 
 <style type="text/css">
-body, td, th {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 15px;
-	font-weight: 600;
-	color: #1d1007;
-	line-height: 24px;
-	color: #1d1007;
-}
-
-.mynav {
-	background-color: #CCFFCC;
-}
-
 .mylabel {
 	font-size: 25px;
 	/* color: #66CCCC; */
 	color: #990066;
 }
 
-.myUpdateInput {
+.myUpdatePwdInput {
+	/* background: transparent; */
 	border-style: solid;
 	border-width: 1px;
 	border-color: gray;
@@ -43,6 +32,11 @@ body, td, th {
 	border-top-color: gray;
 	border-right-color: gray;
 }
+
+
+.myError{
+	color:red;
+}
 </style>
 </head>
 
@@ -52,12 +46,13 @@ body, td, th {
 		UserInfo user = (UserInfo) request.getAttribute("user");
 	%>
 
-	<div class="main">
+	<div>
+		<!-- 【头部部分结束】 -->
 		<div
 			style="background-image: url(./Public/images/headerpic.jpg); width: 100%; height: 200px; background-repeat: repeat; background-size: 100% 200px;">
-			<!-- <h1 style="text-align: center;">欢迎进入员工主页</h1> -->
+			<!-- <h1 style="text-align: center;">欢迎使用本系统</h1> -->
 		</div>
-		<!-- 【导航开始】 -->
+		<!-- ãå¯¼èªå¼å§ã -->
 		<div>
 			<nav class="navbar navbar-default   mynav">
 			<div class="container-fluid">
@@ -78,35 +73,60 @@ body, td, th {
 				<div class="collapse navbar-collapse"
 					id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav" id="mynavUl">
-						<li class="active" id="mynavL1"><a href="./HomeController">个人信息
-								<span class="sr-only">(current)</span>
+						<li class="active" id="mynavL1"><a href="./HomeController">个人信息<span
+								class="sr-only">(current)</span>
 						</a></li>
-						<li id="mynavL2">
-							<a href="javascript:void(0);" onclick="changeDIV();">修改密码</a>
+						<li id="mynavL2"><a href="javascript:void(0);"
+							onclick="changeDIV();">修改密码</a></li>
+						<li id="munavL4"><a
+							href="./HomeController?a=EnterGoodsImport" >商品采购</a>
 						</li>
 						<li id="mynavL3"><a
-							href="./HomeController?a=EnterGoodsExport" target="_blank">商品销售</a></li>
-						<li id="munavL4"><a
-							href="./HomeController?a=EnterGoodsImport" target="_blank">入货处理</a>
-						</li>
-						<li id="munavL5"><a
-							href="./HomeController?a=GoodsBack" target="_blank">退货处理</a>
-						</li>
+							href="./HomeController?a=EnterGoodsExport" >商品销售</a></li>
+						<li id="munavL5"><a href="./HomeController?a=GoodsBack"
+							target="_blank">退货处理</a></li>
 					</ul>
 
 					<ul class="nav navbar-nav navbar-right">
-						<li><a href="javascript:void(0)"> <%=session.getAttribute("username")%></a></li>
 
-						<li><a href="./HomeController?a=Exit"><span
-								class="glyphicon glyphicon-log-out myError" aria-hidden="true"></span>&nbsp;
-								退出</a></li>
+						</li>
+
+						<%
+							if (session.getAttribute("username") == null) {
+						%>
+						<li><a href="./HomeController">登录</a> <%
+ 	} else {
+ %>
+						<li class="dropdown"><a href="#" class="dropdown-toggle"
+							data-toggle="dropdown" role="button" aria-haspopup="true"
+							aria-expanded="false"><%=session.getAttribute("username")%> <span
+								class="caret"></span></a>
+							<ul class="dropdown-menu"
+								style="background-color: #CCFFFF; font-size: 20px; font-weight: 600;">
+								<li><a href="./HomeController?a=Exit">切换账户</a></li>
+								<li role="separator" class="divider"></li>
+								<li><a href="./HomeController?a=Exit">退出</a></li>
+							</ul></li>
+
+
+						<%
+							}
+						%>
+						<li><a href=" javascript:void(0);"> <!-- <span
+								class="glyphicon glyphicon-log-out myError" aria-hidden="true"> 
+								</span>&nbsp; -->注册
+						</a></li>
 					</ul>
 				</div>
 				<!-- /.navbar-collapse -->
 			</div>
 			<!-- /.container-fluid --> </nav>
 		</div>
-		<!-- -【导航结束】 -->
+
+	</div>
+	<!-- 【头部部分结束】 -->
+
+	<div class="main">
 
 
 		<!-- 【个人信息开始】 -->
@@ -126,9 +146,7 @@ body, td, th {
 				<hr class="myhr">
 				<div class="myinfo-second">
 					<span><span class="mylabel">姓名：</span></span>&nbsp;<span
-						class="myinfo-tip"><input class="myUpdateInput" type="text"
-						id="txtName" readonly="readonly" value="<%=user.UserName%>"
-						style="border: none;"></span>&nbsp; <span class="CanEditTrip"><span
+						class="myinfo-tip"><input readonly="readonly" class="txtCanEdit myHideUpdateInput" value="<%=user.UserName%>" id="txtName" /> </span>&nbsp; <span class="CanEditTrip"><span
 						class="glyphicon glyphicon-edit" aria-hidden="true"></span><span
 						id="TrueName_Input_Msg"></span> </span>
 				</div>
@@ -148,18 +166,14 @@ body, td, th {
 
 				<div class="myinfo-second">
 					<span><span class="mylabel">邮箱：</span></span>&nbsp;<span
-						class="myinfo-tip"><input class="myUpdateInput" type="text"
-						id="txtEmail" readonly="readonly" value="<%=user.Email%>"
-						style="border: none;"></span>&nbsp; <span class="CanEditTrip"><span
+						class="myinfo-tip"><input readonly="readonly" class="txtCanEdit myHideUpdateInput" value="<%=user.Email%>" id="txtEmail" /> </span>&nbsp; <span class="CanEditTrip"><span
 						class="glyphicon glyphicon-edit" aria-hidden="true"></span><span
 						id="DeviceId_Input_Msg"></span></span>
 				</div>
 				<hr class="myhr">
 				<div class="myinfo-second">
 					<span><span class="mylabel">手机号码：</span></span>&nbsp;<span
-						class="myinfo-tip"><input class="myUpdateInput" type="text"
-						id="txtPhone" readonly="readonly" value="<%=user.Phone%>"
-						style="border: none;"></span>&nbsp; <span class="CanEditTrip"><span
+						class="myinfo-tip"><input readonly="readonly" class="txtCanEdit myHideUpdateInput" value="<%=user.Phone%>" id="txtPhone" /></span>&nbsp; <span class="CanEditTrip"><span
 						class="glyphicon glyphicon-edit" aria-hidden="true"></span><span
 						id="Phone_Input_Msg"></span></span>
 				</div>
@@ -169,11 +183,11 @@ body, td, th {
 					<span><span class="mylabel">注册时间：</span></span>&nbsp;<span
 						class="myinfo-tip"><input type="text" id="txtSubTime"
 						readonly="readonly" value="<%=user.SubTime%>"
-						style="border: none;"></span>
+						style="border: none; background: transparent;"></span>
 				</div>
 
 
-				<div style="text-align: center; margin-top: 40px;">
+				<div style="text-align: center; margin-top: 40px; font-size: 20px;">
 					<div id="div_update">
 						<input type="button" value="修改" onclick="update()" class="myBtn"
 							style="width: 30%; border-radius: 6px; background-color: #CCFFCC;" />
@@ -195,26 +209,33 @@ body, td, th {
 
 		<!-- 【修改密码开始】 -->
 		<div id="div_updatePwd"
-			style="display:none; background-image: url(./Public/images/userinfoBG.jpg); background-size: auto;">
+			style="display: none; background-image: url(./Public/images/userinfoBG.jpg); background-size: auto;">
 			<div
-				style="margin-left:10%; width: 80%; border-style: solid; border-color: #99CCFF; border-width: 1px; border-radius: 6px; padding: 10px; padding-left: 5%; padding-right: 5%; margin-bottom: 20px; padding-top: 30px;background-color:#FFFFCC">
-				<div style="text-align:center;">
-					<div><h1>修改密码</h1></div>
-					<div style="margin-top:20px;">
-						<span class="mylabel">输入旧密码：</span> <input type="password"  class="myUpdateInput" type="text" id="oldPwd">
+				style="margin-left: 10%; width: 80%; border-style: solid; border-color: #99CCFF; border-width: 1px; border-radius: 6px; padding: 10px; padding-left: 5%; padding-right: 5%; margin-bottom: 20px; padding-top: 30px; background-color: transparent;height: 500px;">
+				<div style="text-align: center;">
+					<div>
+						<h1>修改密码</h1>
 					</div>
-					<div style="margin-top:20px;">
-						<span class="mylabel">输入新密码：</span> <input type="password"   class="myUpdateInput" type="text"
-							id="newPwd1">
+					<div style="margin-top: 20px;">
+						<span class="mylabel">输入旧密码：</span> <input
+							class="myUpdatePwdInput" type="password" class="myUpdateInput"
+							type="text" id="oldPwd">
 					</div>
-					<div style="margin-top:20px;">
-						<span class="mylabel"> 确认新密码：</span> <input type="password" class="myUpdateInput" type="text"
-							id="newPwd2">
+					<div style="margin-top: 20px;">
+						<span class="mylabel">输入新密码：</span> <input
+							class="myUpdatePwdInput" type="password" class="myUpdateInput"
+							type="text" id="newPwd1">
 					</div>
-					<div style="margin-top:20px;">
-						<input type="button" value="修改" onclick="updateStaffPwd()" style="width: 30%; border-radius: 6px; background-color: #CCFFCC;">
+					<div style="margin-top: 20px;">
+						<span class="mylabel"> 确认新密码：</span> <input
+							class="myUpdatePwdInput" type="password" class="myUpdateInput"
+							type="text" id="newPwd2">
 					</div>
-					
+					<div style="margin-top: 40px; font-size: 20px;">
+						<input type="button" value="修改" onclick="updateStaffPwd()"
+							style="width: 20%; border-radius: 6px; background-color: #CCFFCC;">
+					</div>
+
 				</div>
 
 
@@ -243,11 +264,11 @@ body, td, th {
 </div>
 <hr> --%>
 	<!-- ---------------------------------------------------------------------- -->
-	
+
 	<!-- ---------------------------------------------------------------------- -->
-	
+
 	<!-- ----------------------------------------------------------------------------->
-	退货处理：
+	<!-- 退货处理：
 	<br />
 	<div>
 		销售单号：<input id="exportId" type="text" /><input type="button"
@@ -277,8 +298,55 @@ body, td, th {
 	</div>
 
 
-	<hr />
+	<hr /> -->
 	<!-- ---------------------------------------------------------------------------->
+	<div>
+		<!-- 【尾部部分结束】 -->
+		<!-- Button trigger modal -->
+		<button style="display: none;" type="button"
+			class="btn btn-primary btn-lg" data-toggle="modal"
+			data-target="#myModal">Launch demo modal</button>
+
+		<!-- Modal -->
+		<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+			aria-labelledby="myModalLabel">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="myModalLabel">欢迎使用本系统</h4>
+					</div>
+					<div class="modal-body">该系统为超市进销存系统</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+						<!-- <button type="button" class="btn btn-primary">Save changes</button> -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<div class="footer">
+			<div>
+				<span style="color: #990066"> <span
+					class="glyphicon glyphicon-link" aria-hidden="true"></span> 友情链接：
+				</span><a href="http://v3.bootcss.com/" target="_blank">Bootstrap</a> | <a
+					href="http://glyphicons.com/" target="_blank">Glyphicons</a> | <span
+					id="addLink"></span> <a href="javascript:void(0);"
+					onclick="myHelpLink()">帮助</a>
+			</div>
+			<div>
+				2016- © <a href="#">ZRY、CBF、YJB</a>
+			</div>
+
+		</div>
+	</div>
+	<!-- 【尾部部分结束】 -->
+
+
 
 	<script type="text/javascript" src="./Public/js/jquery-1.11.1.min.js"></script>
 	<script type="text/javascript" src="./Public/js/jquery-2.1.4.min.js"></script>
@@ -286,5 +354,15 @@ body, td, th {
 	<script type="text/javascript"
 		src="./Public/My97DatePicker/WdatePicker.js"></script>
 	<script type="text/javascript" src="./Public/js/staff.js"></script>
+	<script type="text/javascript">
+		function myHelpLink() {
+			$(".btn-primary").click();
+		}
+	</script>
+
 </body>
 </html>
+
+
+
+
