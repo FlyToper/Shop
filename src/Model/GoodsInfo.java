@@ -23,6 +23,7 @@ public class GoodsInfo {
 	public int DelFlag;
 	public String State;
 	public String Remark;
+	public int IsSale;
 
 	
 	public int getId() {
@@ -59,10 +60,29 @@ public class GoodsInfo {
 			goodsInfo.DelFlag=rst.getInt(10);
 			goodsInfo.State=rst.getString(11);
 			goodsInfo.Remark=rst.getString(12);
+			goodsInfo.IsSale=rst.getInt(13);
 			
 			goodsInfoArr.add(goodsInfo);
 		}
 		return goodsInfoArr;
+	}
+	
+	//商品上架
+	public int ExecuteUpToSale(String goodsNum){
+		String sql = "Update goodsinfo set IsSale = 1 where GoodsNum = ?";
+		String params[] = {goodsNum};
+		
+		//执行更新
+		return  new DBOper().executeUpdate(sql,params);
+	}
+	
+	//商品下架
+	public int ExecuteDownToSale(String goodsNum){
+		String sql = "Update goodsinfo set IsSale = 0 where GoodsNum = ?";
+		String params[] = {goodsNum};
+		
+		//执行更新
+		return  new DBOper().executeUpdate(sql,params);
 	}
 
 }

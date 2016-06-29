@@ -7,7 +7,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>员工主页</title>
+<title>商品采购</title>
 
 <link href="./Public/css/bootstrap.min.css" rel="stylesheet"
 	type="text/css" />
@@ -42,9 +42,7 @@
 
 <body>
 	<!-- 取得后台传过来的员工信息对象 -->
-	<%
-		UserInfo user = (UserInfo) request.getAttribute("user");
-	%>
+
 
 	<div>
 		<!-- 【头部部分结束】 -->
@@ -73,11 +71,11 @@
 				<div class="collapse navbar-collapse"
 					id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav" id="mynavUl">
-						<li class="active" id="mynavL1"><a href="javascript:void(0);">个人信息<span
-								class="sr-only">(current)</span>
+						<li  id="mynavL1"><a href="./HomeController">个人信息
 						</a></li>
-						<li id="mynavL2"><a href="./HomeController?a=UpdatePwd"
-							>修改密码</a></li>
+						<li class="active" id="mynavL2"><a href="javascript:void(0);"
+							>修改密码<span
+								class="sr-only">(current)</span></a></li>
 						<li id="munavL4"><a
 							href="./HomeController?a=EnterGoodsImport" >商品采购</a>
 						</li>
@@ -131,85 +129,13 @@
 
 		<!-- 【个人信息开始】 -->
 
-		<div id="div_userInfo"
-			style="background-image: url(./Public/images/userinfoBG.jpg); background-size: auto;">
-			<div
-				style="margin-left: 10%; margin-right: 10%; width: 80%; border-style: solid; border-color: #99CCFF; border-width: 1px; border-radius: 6px; padding: 10px; padding-left: 5%; padding-right: 5%; margin-bottom: 20px; padding-top: 30px;">
-
-				<div class="myinfo-second">
-					<span> <span class="mylabel">编号：</span>
-					</span>&nbsp; <span class="myinfo-tip"><input type="text"
-						id="txtNum" readonly="readonly" value="<%=user.UserNum%>"
-						style="border: none;"></span>
-				</div>
-
-				<hr class="myhr">
-				<div class="myinfo-second">
-					<span><span class="mylabel">姓名：</span></span>&nbsp;<span
-						class="myinfo-tip"><input readonly="readonly" class="txtCanEdit myHideUpdateInput" value="<%=user.UserName%>" id="txtName" /> </span>&nbsp; <span class="CanEditTrip"><span
-						class="glyphicon glyphicon-edit" aria-hidden="true"></span><span
-						id="TrueName_Input_Msg"></span> </span>
-				</div>
-				<hr class="myhr">
-				<div class="myinfo-second">
-					<span><span class="mylabel">性别：</span></span>&nbsp;<span
-						class="myinfo-tip"><span id="Gender_Man"> 男</span><input
-						type="radio" name="Gender" checked="checked" class="radio_gender"
-						value="man"> <span>女</span><input type="radio"
-						name="Gender" class="radio_gender" value="woman"> <span>保密</span><input
-						type="radio" name="Gender" class="radio_gender" value="no"></span>&nbsp;
-					<span class="CanEditTrip"><span
-						class="glyphicon glyphicon-edit" aria-hidden="true"></span><span
-						id="Gender_Input_Msg"></span></span>
-				</div>
-				<hr class="myhr">
-
-				<div class="myinfo-second">
-					<span><span class="mylabel">邮箱：</span></span>&nbsp;<span
-						class="myinfo-tip"><input readonly="readonly" class="txtCanEdit myHideUpdateInput" value="<%=user.Email%>" id="txtEmail" /> </span>&nbsp; <span class="CanEditTrip"><span
-						class="glyphicon glyphicon-edit" aria-hidden="true"></span><span
-						id="DeviceId_Input_Msg"></span></span>
-				</div>
-				<hr class="myhr">
-				<div class="myinfo-second">
-					<span><span class="mylabel">手机号码：</span></span>&nbsp;<span
-						class="myinfo-tip"><input readonly="readonly" class="txtCanEdit myHideUpdateInput" value="<%=user.Phone%>" id="txtPhone" /></span>&nbsp; <span class="CanEditTrip"><span
-						class="glyphicon glyphicon-edit" aria-hidden="true"></span><span
-						id="Phone_Input_Msg"></span></span>
-				</div>
-
-				<hr class="myhr">
-				<div class="myinfo-second">
-					<span><span class="mylabel">注册时间：</span></span>&nbsp;<span
-						class="myinfo-tip"><input type="text" id="txtSubTime"
-						readonly="readonly" value="<%=user.SubTime%>"
-						style="border: none; background: transparent;"></span>
-				</div>
-
-
-				<div style="text-align: center; margin-top: 40px; font-size: 20px;">
-					<div id="div_update">
-						<input type="button" value="修改" onclick="update()" class="myBtn"
-							style="width: 30%; border-radius: 6px; background-color: #CCFFCC;" />
-					</div>
-
-					<div id="div_save" style="display: none;">
-						<input type="button" value="保存" onclick="save()"
-							style="width: 30%; border-radius: 6px; background-color: #CCFFCC;" />
-						<input type="button" value="取消" onclick="updateCancel()"
-							style="width: 30%; border-radius: 6px; background-color: #CCFFCC;" />
-					</div>
-				</div>
-
-
-			</div>
-			<br /> <br />
-		</div>
+		
 		<!-- 【个人信息开始】 -->
 
 		<!-- 【修改密码开始】 -->
+		
 		<div id="div_updatePwd"
-			style="display: none; background-image: url(./Public/images/userinfoBG.jpg); background-size: auto;">
+			style=" background-image: url(./Public/images/userinfoBG.jpg); background-size: auto;">
 			<div
 				style="margin-left: 10%; width: 80%; border-style: solid; border-color: #99CCFF; border-width: 1px; border-radius: 6px; padding: 10px; padding-left: 5%; padding-right: 5%; margin-bottom: 20px; padding-top: 30px; background-color: transparent;height: 500px;">
 				<div style="text-align: center;">
@@ -243,62 +169,14 @@
 			</div>
 			<br /> <br />
 		</div>
-
 		<!-- 【修改密码结束】 -->
 
 	</div>
 
-	<%-- 员工基本信息：<br/>
-编号：<input type="text" id="txtNum" readonly="readonly" value="<%=user.UserNum %>" style="border: none;"><br/>
-姓名：<input type="text" id="txtName" readonly="readonly" value="<%=user.UserName %>" style="border: none;"><br/>
-邮箱：<input type="text" id="txtEmail" readonly="readonly" value="<%=user.Email %>" style="border: none;"><br/>
-电话：<input type="text" id="txtPhone" readonly="readonly" value="<%=user.Phone %>" style="border: none;"><br/>
-性别：<input type="text" id="txtGender" readonly="readonly" value="<%=user.Gender %>" style="border: none;"><br/>
-注册时间：<input type="text" id="txtSubTime" readonly="readonly" value="<%=user.SubTime %>" style="border: none;"><br/>
-<div id="div_update">
-	<input type="button"  value="修改" onclick="update()" class="myBtn">
-</div>
-<div id="div_save" style="display: none">
-	<input type="button"  value="保存" onclick="save()">
-	<input type="button"  value="取消" onclick="updateCancel()">
-</div>
-<hr> --%>
-	<!-- ---------------------------------------------------------------------- -->
 
-	<!-- ---------------------------------------------------------------------- -->
-
-	<!-- ----------------------------------------------------------------------------->
-	<!-- 退货处理：
-	<br />
-	<div>
-		销售单号：<input id="exportId" type="text" /><input type="button"
-			value="查询单号" onclick="QueryExportInfoByExportId()">
-	</div>
-	<div id="div_showExportInfo" style="display: none;">
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<h3>查询结果:</h3>
-		销售单号：<input type="text" id="id" readonly="readonly"
-			style="border: none;"><br /> 商品编号：<input type="text"
-			id="goodsNum" readonly="readonly" style="border: none;">&nbsp;&nbsp;商品名称：<input
-			type="text" id="goodsName" readonly="readonly" style="border: none;"><br />
-		销售数量：<input type="text" id="number" readonly="readonly"
-			style="border: none;">&nbsp;&nbsp;销售价格：<input type="text"
-			id="price" readonly="readonly" style="border: none;"><br />
-		销售员编号：<input type="text" id="userNum" readonly="readonly"
-			style="border: none;">销售员名字：<input type="text" id="userName"
-			readonly="readonly" style="border: none;"><br /> <input
-			id="1" type="button" value="退货" onclick="saleBack1()">
-		<div id="2" style="display: none;">
-			<h3>填写退货信息:</h3>
-			顾客电话:&nbsp;<input type="text" id="customerPhone">&nbsp;&nbsp;&nbsp;&nbsp;
-			顾客名字:&nbsp;<input type="text" id="customerName"><br /> <br />
-			退货描述:&nbsp;<input type="text" style="width: 600px" id="description"><br />
-			<br /> <input type="button" value="确认退货" onclick="saleBack2()">
-		</div>
-	</div>
+	
 
 
-	<hr /> -->
 	<!-- ---------------------------------------------------------------------------->
 	<div>
 		<!-- 【尾部部分结束】 -->
@@ -359,7 +237,7 @@
 			$(".btn-primary").click();
 		}
 	</script>
-
+<a href="./students.xls">下载</a>
 </body>
 </html>
 

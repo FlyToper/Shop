@@ -45,7 +45,13 @@ body, td, th {
 	margin-bottom: 20px;
 }
 
+.error{
+	color:red;
+}
 
+.success{
+	color:green;
+}
 
 
 

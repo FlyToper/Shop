@@ -1,5 +1,6 @@
 <%@page import="Model.UserInfo"%>
 <%@page import="Model.GoodsInfo"%>
+<%@page import="Model.CategoryInfo"%>
 <%@page import="java.util.ArrayList"%>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -19,6 +20,9 @@
 <link href="./Public/css/stuinfo.css" rel="stylesheet" type="text/css">
 
 <style type="text/css">
+	body{
+		background-color: #F9F6F7;
+	}
 .mylabel {
 	font-size: 25px;
 	/* color: #66CCCC; */
@@ -75,12 +79,9 @@
 				<div class="collapse navbar-collapse"
 					id="bs-example-navbar-collapse-1">
 					<ul class="nav navbar-nav" id="mynavUl">
-						<li  id="mynavL1"><a href="./HomeController">个人信息
-						</a></li>
-						<li id="mynavL2"><a href="javascript:void(0);"
-							onclick="changeDIV();">修改密码</a></li>
-						<li class="active" id="munavL4"><a
-							href="./HomeController?a=EnterGoodsImport">商品采购<span
+						<li id="mynavL1"><a href="./HomeController">个人信息 </a></li>
+						<li id="mynavL2"><a href="./HomeController?a=UpdatePwd">修改密码</a></li>
+						<li class="active" id="munavL4"><a href="javascript:void(0);">商品采购<span
 								class="sr-only">(current)</span></a></li>
 						<li id="mynavL3"><a
 							href="./HomeController?a=EnterGoodsExport">商品销售</a></li>
@@ -133,16 +134,18 @@
 		<!-- 【个人信息开始】 -->
 		<%
 			ArrayList<GoodsInfo> goodsInfoArr = (ArrayList<GoodsInfo>) request.getAttribute("goodsInfoArr");
+		ArrayList<CategoryInfo> cateInfoArr = (ArrayList<CategoryInfo>) request.getAttribute("cateInfoArr");
 		%>
-		<h1 style="text-align: center;">欢迎进入入货页面</h1>
+		<h1 style="text-align: center;">当前库存</h1>
 		<hr>
 		<div class="row myheaderrow">
 			<div class="col-sm-2 col-md-1 myfirstcol myheaderlabel">商品编号</div>
 			<div class="col-sm-2 col-md-2 mycol myheaderlabel">商品名称</div>
 			<div class="col-sm-2 col-md-1 mycol myheaderlabel">商品类型</div>
-			<div class="col-sm-2 col-md-1 mycol myheaderlabel">商品价格</div>
+			<div class="col-sm-2 col-md-2 mycol myheaderlabel">商品价格(单位：元)</div>
 			<div class="col-sm-2 col-md-2 mycol myheaderlabel">商品库存量</div>
-			<div class="col-sm-2 col-md-5 mylastcol myheaderlabel">操作</div>
+			<div class="col-sm-2 col-md-1 mycol myheaderlabel">是否上架</div>
+			<div class="col-sm-2 col-md-3 mylastcol myheaderlabel">操作</div>
 		</div>
 		<%
 			for (int i = 0; i < goodsInfoArr.size(); i++) {
@@ -161,11 +164,51 @@
 			<div class="col-sm-2 col-md-1 mycol"><%=g.GoodsNum%></div>
 			<div class="col-sm-2 col-md-2 mycol"><%=g.GoodsName%></div>
 			<div class="col-sm-2 col-md-1 mycol"><%=g.CateName%></div>
-			<div class="col-sm-2 col-md-1 mycol"><%=g.Price%></div>
-			<div class="col-sm-2 col-md-2 mycol"><%=g.TotalNumber%></div>
+			<div class="col-sm-2 col-md-2 mycol"><%=g.Price%></div>
+			<%
+				if (g.TotalNumber < 100) {
+			%>
+			<div class="col-sm-2 col-md-2 mycol">
+				<span style="color: red;"><%=g.TotalNumber%></span>
+			</div>
+			<%
+				} else {
+			%>
+			<div class="col-sm-2 col-md-2 mycol">
+				<span><%=g.TotalNumber%></span>
+			</div>
+			<%
+				}
+			%>
+			<!-- <div class="col-sm-2 col-md-1 mycol ">否</div> -->
+			<%
+				if (g.IsSale == 0) {
+			%>
+			<div class="col-sm-2 col-md-1 mycol ">否</div>
+			<%
+				} else {
+			%>
+			<div class="col-sm-2 col-md-1 mycol ">是</div>
+			<%
+				}
+			%>
+			<div id="<%=div_sale%>" class="col-sm-2 col-md-3 mycol">
+				<a href="javascript:void(0);" onclick="sale(<%=i%>)">采购</a> |
+				<%
+					if (g.IsSale == 0) {
+				%>
+				<a href="javascript:void(0);" style="color:#669900" onclick="UpToSale('<%=g.GoodsNum%>')"><span
+					class="glyphicon glyphicon-upload" aria-hidden="true"></span> 上架</a>
+				<%
+					} else {
+				%>
+				<a href="javascript:void(0);" style="color:#FF9999"
+					onclick="DownToSale('<%=g.GoodsNum%>')"><span
+					class="glyphicon glyphicon-download" aria-hidden="true"></span> 下架</a>
+				<%
+					}
+				%>
 
-			<div id="<%=div_sale%>" class="col-sm-2 col-md-5 mycol">
-				<a onclick="sale(<%=i%>)">入货</a>
 			</div>
 
 			<div id="<%=div_saleEnter%>" style="display: none"
@@ -187,11 +230,52 @@
 			<div class="col-sm-2 col-md-1 mycol"><%=g.GoodsNum%></div>
 			<div class="col-sm-2 col-md-2 mycol"><%=g.GoodsName%></div>
 			<div class="col-sm-2 col-md-1 mycol"><%=g.CateName%></div>
-			<div class="col-sm-2 col-md-1 mycol"><%=g.Price%></div>
-			<div class="col-sm-2 col-md-2 mycol"><%=g.TotalNumber%></div>
+			<div class="col-sm-2 col-md-2 mycol"><%=g.Price%></div>
+			<%
+				if (g.TotalNumber < 100) {
+			%>
+			<div class="col-sm-2 col-md-2 mycol">
+				<span style="color: red;"><%=g.TotalNumber%></span>
+			</div>
+			<%
+				} else {
+			%>
+			<div class="col-sm-2 col-md-2 mycol">
+				<span><%=g.TotalNumber%></span>
+			</div>
+			<%
+				}
+			%>
+			<!-- <div class="col-sm-2 col-md-1 mycol ">否</div> -->
+			<%
+				if (g.IsSale == 0) {
+			%>
+			<div class="col-sm-2 col-md-1 mycol ">否</div>
+			<%
+				} else {
+			%>
+			<div class="col-sm-2 col-md-1 mycol ">是</div>
+			<%
+				}
+			%>
 
-			<div id="<%=div_sale%>" class="col-sm-2 col-md-5 mycol">
-				<a onclick="sale(<%=i%>)">入货</a>
+			<div id="<%=div_sale%>" class="col-sm-2 col-md-3 mycol">
+				<a href="javascript:void(0);" onclick="sale(<%=i%>)">采购</a> |
+				<%
+					if (g.IsSale == 0) {
+				%>
+				<a href="javascript:void(0);" style="color:#669900" onclick="UpToSale('<%=g.GoodsNum%>')"><span
+					class="glyphicon glyphicon-upload" aria-hidden="true"></span> 上架</a>
+				<%
+					} else {
+				%>
+				<a href="javascript:void(0);" style="color:#FF9999"
+					onclick="DownToSale('<%=g.GoodsNum%>')"><span
+					class="glyphicon glyphicon-download" aria-hidden="true"></span> 下架</a>
+				<%
+					}
+				%>
+
 			</div>
 
 			<div id="<%=div_saleEnter%>" style="display: none"
@@ -211,17 +295,119 @@
 		<%
 			}
 		%>
+		<div style="width: 100%; margin-top: 20px;">
 
-		<!-- 【个人信息开始】 -->
+			<div class="col-md-12" style="text-align: right; border-style: none;">
+				<span style="border: 1px solid blue; border-radius: 6px; padding: 5px; background-color: #FFFFCC;margin-right:10px;">
+					<a href="javascript:void(0);" onclick="myAddGoods()"><span class="glyphicon glyphicon-plus"
+						aria-hidden="true"></span> 新增商品</a>
+				</span>
+				
+				<span
+					style="border: 1px solid blue; border-radius: 6px; padding: 5px; background-color: #FFFFCC;">
+					<a href="javascript:void(0);" onclick="myAddCotegory()"><span class="glyphicon glyphicon-plus"
+						aria-hidden="true"></span> 新增商品分类</a>
+				</span>
+			</div>
+		</div>
 
-		<!-- 【修改密码开始】 -->
 
 
-		<!-- 【修改密码结束】 -->
 
 	</div>
+	<!-- main -->
+	<div>
+		<!-- 【采购页面】 -->
+		<button id="btnAddGoods" style="display:none" type="button" class="btn btn-primary" data-toggle="modal"
+			data-target="#exampleModal" data-whatever="@mdo">Open modal
+			for @mdo</button>
 
+		<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+			aria-labelledby="exampleModalLabel">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="exampleModalLabel">新增商品</h4>
+					</div>
+					<div class="modal-body">
+						<form>
+							<div class="form-group">
+								<label for="recipient-name" class="control-label">商品名称</label>
+								<input type="text" class="form-control" id="recipient-name">
+							</div>
+							<div class="form-group">
+								<label for="recipient-name" class="control-label">分类：</label>
+								<select style="border-radius:6px;">
+									<option>请选择--</option>
+									<%for(int k =0;k < cateInfoArr.size();k++) { CategoryInfo c = cateInfoArr.get(k); %><option><%=c.CateName %></option><%} %>
+								</select>
+							</div>
+							<div class="form-group">
+								<label for="recipient-name" class="control-label">出售价格：</label>
+								<input type="text" style="border-radius:6px;" >
+							</div>
+							
+							<div class="form-group">
+								<label for="message-text" class="control-label">备注信息（选填）:</label>
+								<textarea class="form-control" id="message-text"></textarea>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary">保存</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 【采购页面】 -->
 
+	<!-- 【新增商品页面】 -->
+	
+	<button id="btnAddGoodsCategory" style="display:none" type="button" class="btn btn-primary" data-toggle="modal"
+			data-target="#exampleModa2" data-whatever="@mdo">Open modal
+			for @mdo</button>
+
+		<div class="modal fade" id="exampleModa2" tabindex="1" role="dialog"
+			aria-labelledby="exampleModalLabel">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="exampleModalLabel">新增商品分类</h4>
+					</div>
+					<div class="modal-body">
+						<form>
+							<div class="form-group">
+								<label for="recipient-name" class="control-label">分类名字</label>
+								<input type="text" class="form-control" id="txtCateName">
+							</div>
+							<div style="margin-bottom:10px;color:gray;margin-left:10px;">已存在的分类：<%for(int k =0;k < cateInfoArr.size();k++) { CategoryInfo c = cateInfoArr.get(k); %>【<%=c.CateName %>】<%} %></div>
+							<div class="form-group">
+								<label for="message-text" class="control-label">备注信息（选填）</label>
+								<textarea class="form-control" id="txtCateRemark" placeholder="请输入..." ></textarea>
+							</div>
+						</form>
+					</div>
+					<div class="modal-footer">
+						<span  id="msgSaveCategory"></span>&nbsp;&nbsp;
+						<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary" onclick="SaveNewCategory()">保存</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!-- 【新增商品页面】 -->
 
 
 
@@ -231,7 +417,7 @@
 		<!-- Button trigger modal -->
 		<button style="display: none;" type="button"
 			class="btn btn-primary btn-lg" data-toggle="modal"
-			data-target="#myModal">Launch demo modal</button>
+			data-target="#myModal" id="btnHelpLink">Launch demo modal</button>
 
 		<!-- Modal -->
 		<div class="modal fade" id="myModal" tabindex="-1" role="dialog"
@@ -265,14 +451,14 @@
 					onclick="myHelpLink()">帮助</a>
 			</div>
 			<div>
-				2016- © <a href="#">ZRY、CBF、YJB</a>
+				2016- © <a href="#">ZRY、CBF、YJB </a>
 			</div>
 
 		</div>
 	</div>
 	<!-- 【尾部部分结束】 -->
-
-
+	
+	
 
 	<script type="text/javascript" src="./Public/js/jquery-1.11.1.min.js"></script>
 	<script type="text/javascript" src="./Public/js/jquery-2.1.4.min.js"></script>
@@ -280,9 +466,21 @@
 	<script type="text/javascript"
 		src="./Public/My97DatePicker/WdatePicker.js"></script>
 	<script type="text/javascript" src="./Public/js/staff.js"></script>
+	<script type="text/javascript" src="./Public/js/goods.js"></script>
 	<script type="text/javascript">
 		function myHelpLink() {
-			$(".btn-primary").click();
+			//$(".btn-primary").click();
+			$("#btnHelpLink").click();
+		}
+		
+		//商品新增
+		function myAddGoods(){
+			$("#btnAddGoods").click();
+		}
+		
+		//商品类型新增
+		function myAddCotegory(){
+			$("#btnAddGoodsCategory").click();
 		}
 	</script>
 
