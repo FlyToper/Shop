@@ -7,6 +7,8 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.jws.soap.SOAPBinding;
 import javax.servlet.RequestDispatcher;
@@ -24,6 +26,7 @@ import Model.CategoryInfo;
 import Model.ExportInfo;
 import Model.GoodsInfo;
 import Model.ImportInfo;
+import Model.ProviderInfo;
 import Model.UserInfo;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
@@ -152,12 +155,62 @@ public class HomeController extends Controller {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}else if(action.equals("AddNewGoodsInfo") && IsLogin() ){
+			//调用商品新增方法
+			try {
+				AddNewGoodsInfoAction();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else {
 			// 【用户还没有登录直接进来，跳转登录页面】
 			response.sendRedirect("./login.html");
 
 		}
 	}
+	
+	//新增商品信息
+	public void AddNewGoodsInfoAction() throws SQLException, IOException{
+		String goodsName = myRequest.getParameter("newGoodsName");
+		String categoryAndId = myRequest.getParameter("newCategory");
+		String categoryAndIds[] = categoryAndId.split("#"); 
+		String id = categoryAndIds[1];
+		String category = categoryAndIds[0];
+		
+		
+		String salePrice = myRequest.getParameter("newSalePrice");
+		String remark = myRequest.getParameter("newRemark");
+		
+		//System.out.print("id="+id+", categoryname="+category);
+		
+		
+	
+		GoodsInfo goods = new GoodsInfo();
+		goods.CateId = Integer.parseInt(id);
+		goods.CateName = category;
+		goods.Remark = remark;
+		goods.GoodsName = goodsName;
+		goods.IsSale = 0;
+		goods.Price = Integer.parseInt(salePrice);
+		goods.TotalNumber = 0;
+		goods.SaleNumber = 0;
+		goods.IsSale = 0;
+		goods.State = "正常";
+		
+		goods.GoodsNum = goods.getNewGoodsNum();
+		
+		//执行插入操作
+		int rst = goods.AddNewGoodsInfo(goods);
+		if(rst > 0){
+			myResponse.getWriter().print("success");
+		}else{
+			myResponse.getWriter().print("error");
+		}
+		//myResponse.getWriter().print(goods.getNewGoodsNum()) ;
+		
+	}
+	
 
 	//测试
 	public void test() throws ServletException, IOException{
@@ -460,11 +513,16 @@ public class HomeController extends Controller {
 
 	// 进入入货页面Action
 	public void EnterGoodsImportAction() throws SQLException, ServletException, IOException {
+		//获取商品列表
 		ArrayList<GoodsInfo> goodsInfoArr = new GoodsInfo().getAllGoodsInfo();
+		//获取商品类型列表
 		ArrayList<CategoryInfo> cateInfoArr = new CategoryInfo().getAllCategoryInfo();
+		//获取提供商列表
+		ArrayList<ProviderInfo> proInfoArr = new ProviderInfo().getAllProviderInfo();
 		System.out.println("数据访问成功，返回");
 		myRequest.setAttribute("goodsInfoArr", goodsInfoArr);
 		myRequest.setAttribute("cateInfoArr", cateInfoArr);
+		myRequest.setAttribute("proInfoArr", proInfoArr);
 		// 跳转到商品销售页
 		RequestDispatcher dispatcher = myRequest.getRequestDispatcher("WEB-INF/View/Home/GoodsImport.jsp");
 		dispatcher.forward(myRequest, myResponse);

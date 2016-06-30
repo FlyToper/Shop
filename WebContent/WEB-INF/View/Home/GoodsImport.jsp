@@ -1,3 +1,4 @@
+<%@page import="Model.ProviderInfo"%>
 <%@page import="Model.UserInfo"%>
 <%@page import="Model.GoodsInfo"%>
 <%@page import="Model.CategoryInfo"%>
@@ -18,6 +19,7 @@
 	type="text/css">
 <link href="./Public/css/examAdmin.css" rel="stylesheet" type="text/css">
 <link href="./Public/css/stuinfo.css" rel="stylesheet" type="text/css">
+<link href="./Public/css/checkbox.css" rel="stylesheet" type="text/css">
 
 <style type="text/css">
 	body{
@@ -135,11 +137,12 @@
 		<%
 			ArrayList<GoodsInfo> goodsInfoArr = (ArrayList<GoodsInfo>) request.getAttribute("goodsInfoArr");
 		ArrayList<CategoryInfo> cateInfoArr = (ArrayList<CategoryInfo>) request.getAttribute("cateInfoArr");
+		ArrayList<ProviderInfo> proInfoArr = (ArrayList<ProviderInfo>) request.getAttribute("proInfoArr");
 		%>
 		<h1 style="text-align: center;">当前库存</h1>
 		<hr>
 		<div class="row myheaderrow">
-			<div class="col-sm-2 col-md-1 myfirstcol myheaderlabel">商品编号</div>
+			<div class="col-sm-2 col-md-1 myfirstcol myheaderlabel">序号</div>
 			<div class="col-sm-2 col-md-2 mycol myheaderlabel">商品名称</div>
 			<div class="col-sm-2 col-md-1 mycol myheaderlabel">商品类型</div>
 			<div class="col-sm-2 col-md-2 mycol myheaderlabel">商品价格(单位：元)</div>
@@ -161,7 +164,7 @@
 			if (i % 2 == 0) {
 		%>
 		<div class="row myotherrow2">
-			<div class="col-sm-2 col-md-1 mycol"><%=g.GoodsNum%></div>
+			<div class="col-sm-2 col-md-1 mycol"><%=i+1%></div>
 			<div class="col-sm-2 col-md-2 mycol"><%=g.GoodsName%></div>
 			<div class="col-sm-2 col-md-1 mycol"><%=g.CateName%></div>
 			<div class="col-sm-2 col-md-2 mycol"><%=g.Price%></div>
@@ -227,7 +230,7 @@
 			} else {
 		%>
 		<div class="row myotherrow1">
-			<div class="col-sm-2 col-md-1 mycol"><%=g.GoodsNum%></div>
+			<div class="col-sm-2 col-md-1 mycol"><%=i+1%></div>
 			<div class="col-sm-2 col-md-2 mycol"><%=g.GoodsName%></div>
 			<div class="col-sm-2 col-md-1 mycol"><%=g.CateName%></div>
 			<div class="col-sm-2 col-md-2 mycol"><%=g.Price%></div>
@@ -336,30 +339,54 @@
 					<div class="modal-body">
 						<form>
 							<div class="form-group">
-								<label for="recipient-name" class="control-label">商品名称</label>
-								<input type="text" class="form-control" id="recipient-name">
+								<label for="txtNewGoodsName" class="control-label">商品名称</label>
+								<input type="text" class="form-control" id="txtNewGoodsName" placeholder="请输入...">
 							</div>
 							<div class="form-group">
-								<label for="recipient-name" class="control-label">分类：</label>
-								<select style="border-radius:6px;">
-									<option>请选择--</option>
-									<%for(int k =0;k < cateInfoArr.size();k++) { CategoryInfo c = cateInfoArr.get(k); %><option><%=c.CateName %></option><%} %>
+								<label for="selNewCategory" class="control-label">分类：</label>
+								<select style="border-radius:6px;" id="selNewCategory">
+									<option id="0" value="0">请选择</option>
+									<%for(int k =0;k < cateInfoArr.size();k++) { CategoryInfo c = cateInfoArr.get(k); %><option  value="<%=c.CateName%>#<%=c.id %>"><%=c.CateName %></option><%} %>
 								</select>
 							</div>
 							<div class="form-group">
-								<label for="recipient-name" class="control-label">出售价格：</label>
-								<input type="text" style="border-radius:6px;" >
+								<label for="txtNewSalePrice" class="control-label">出售价格：</label>
+								<input type="text" style="font-size:14px; border-radius:6px;padding:6px 12px;height: 34px;" id="txtNewSalePrice" placeholder="请输入..." >
+								&nbsp;&nbsp;
+								<label for="isUpToSale">是否立即上架： </label>
+								<input type="checkbox" id="isUpToSale" class="chk_1" /> 
+								<label for="isUpToSale">&nbsp;&nbsp;&nbsp;&nbsp;</label>
 							</div>
+							<hr>
+							
+							<div class="form-group"><!-- 【选择供货商开始】 -->
+								<label for="txtNewRemark" class="control-label">供货商（选填）：</label> 
+								<select style="border-radius:6px;" id="selProviderName" onchange="ShowImportInfo()">
+									<option value="0">请选择</option>
+									<%for(int k =0;k < proInfoArr.size();k++) { ProviderInfo p = proInfoArr.get(k); %><option  value="<%=p.ProvideName%>#<%=p.id %>"><%=p.ProvideName %></option><%} %>
+								</select>
+							</div><!-- 【选择供货商开始】 -->
+							<div class="form-group" id="div_importInfo" style="display:none;"><!-- 【选择供货商开始】 -->
+								&nbsp;&nbsp;
+								<label for="txtNewTotalNumber" class="control-label" >初始入货量：</label> 
+								<input type="text" style="border-radius:6px;width:80px;padding:6px 12px;height: 34px;" id="txtNewTotalNumber" value="0" >
+								&nbsp;&nbsp;
+								<label for="txtNewPrice" class="control-label">进货价格：</label> 
+								<input type="text" style="border-radius:6px;width:80px;padding:6px 12px;height: 34px;" id="txtNewTotalNumber" >
+							</div><!-- 【选择供货商结束】 -->
 							
 							<div class="form-group">
-								<label for="message-text" class="control-label">备注信息（选填）:</label>
-								<textarea class="form-control" id="message-text"></textarea>
+								<label for="txtNewRemark" class="control-label">备注信息（选填）:</label>
+								<textarea class="form-control" id="txtNewRemark" placeholder="请输入250字以内的信息..." ></textarea>
+								
 							</div>
+							
 						</form>
 					</div>
 					<div class="modal-footer">
-						<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-						<button type="button" class="btn btn-primary">保存</button>
+						<span id="msgNewGoodsInfo"></span>
+						<span onclick="CancelNewGoodsInfo()"><button type="button" class="btn btn-default" data-dismiss="modal" >取消</button></span> 
+						<button type="button" class="btn btn-primary" onclick="SaveNewGoodsInfo()">保存</button>
 					</div>
 				</div>
 			</div>
@@ -467,6 +494,7 @@
 		src="./Public/My97DatePicker/WdatePicker.js"></script>
 	<script type="text/javascript" src="./Public/js/staff.js"></script>
 	<script type="text/javascript" src="./Public/js/goods.js"></script>
+	<script type="text/javascript" src="./Public/js/checkbox.js"></script>
 	<script type="text/javascript">
 		function myHelpLink() {
 			//$(".btn-primary").click();
