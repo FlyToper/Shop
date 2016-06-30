@@ -7,6 +7,8 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
 <title>员工主页</title>
 
 <link href="./Public/css/bootstrap.min.css" rel="stylesheet"
@@ -41,6 +43,7 @@
 </head>
 
 <body>
+
 	<!-- 取得后台传过来的员工信息对象 -->
 	<%
 		UserInfo user = (UserInfo) request.getAttribute("user");
@@ -83,8 +86,8 @@
 						</li>
 						<li id="mynavL3"><a
 							href="./HomeController?a=EnterGoodsExport" >商品销售</a></li>
-						<li id="munavL5"><a href="./HomeController?a=GoodsBack"
-							target="_blank">退货处理</a></li>
+						<li id="munavL5"><a href="./HomeController?a=EnterGoodsBack"
+							>退货处理</a></li>
 					</ul>
 
 					<ul class="nav navbar-nav navbar-right">

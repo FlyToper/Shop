@@ -10,6 +10,7 @@ public class ImportInfo {
 	public int id;
 	public String GoodsNum;
 	public String GoodsName;
+	public int ProviderId;
 	public String ProviderName;//供货商名字
 	public int Number;//进货量
 	public int Price;//入货价格
@@ -38,6 +39,18 @@ public class ImportInfo {
 		}else{
 			return "error";
 		}
+	}
+	
+	//添加进货信息
+	public int AddImportInfo(ImportInfo importinfo){
+		System.out.print("进入ImportInfo");
+		String sql = "insert into importinfo(GoodsNum,GoodsName,ProviderId, ProviderName,Number,Price,UserNum,UserName) values(?,?,?,?,?,?,?,?)";
+		String params[] = {importinfo.GoodsNum, importinfo.GoodsName, String.valueOf( importinfo.ProviderId), importinfo.ProviderName, String.valueOf(importinfo.Number), String.valueOf(importinfo.Price), importinfo.UserNum, importinfo.UserName};
+		
+		DBOper db = new DBOper();
+		
+		return  db.executeUpdate(sql, params);
+		
 	}
 
 	//根据商品编号查询该商品的供货商

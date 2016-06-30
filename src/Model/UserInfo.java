@@ -3,6 +3,8 @@ package Model;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
+
 import Core.DBOper;
 
 //普通员工
@@ -128,4 +130,135 @@ public class UserInfo {
 			return "error";
 		}
 	}
+	
+	//添加员工方法
+		public String addUserInfo(String userNum, String userName, String gender){
+			System.out.println("进入数据访问层addUserInfo(成功");
+			
+			String sql="insert into UserInfo(UserNum,UserPwd,UserName,Gender) values(?,?,?,?)";
+			String[] params={userNum , "888888",userName, gender};
+			
+			int n = new DBOper().executeUpdate(sql, params);
+			
+			if(n>=1){
+				return "success";
+			}else{
+				return "error";
+			}
+		}
+		
+		//查询所有员工
+		public ArrayList<UserInfo> getAllUserInfo() throws SQLException, ParseException{
+			System.out.println("进入数据访问层 getAllUserInfo(成功");
+			ArrayList<UserInfo> userInfoArr=new ArrayList<UserInfo>();
+			
+			String sql = "select * from UserInfo where delflag=0 Order By UserNum";
+		    String[] params = {};
+		    
+			ResultSet rst = new DBOper().executeQuery(sql,params);
+			
+			while(rst.next()){
+				    UserInfo userInfo = new UserInfo();
+					
+				    if(rst.getString(2) == null){
+				    	userInfo.UserNum="";
+					}else{
+						userInfo.UserNum=rst.getString(2);
+					}
+					if(rst.getString(4) == null){
+						userInfo.UserName="";
+					}else{
+						userInfo.UserName=rst.getString(4);
+					}
+					userInfo.Email=rst.getString(5);
+					userInfo.Phone=rst.getString(6);
+					userInfo.Gender=rst.getString(7);
+
+					userInfoArr.add(userInfo);
+				}
+			return userInfoArr;
+			}
+		
+		//删除员工信息
+		public String deleteUserInfo(String userNum){
+			System.out.println("进入数据访问层deleteUserInfo(成功");
+			String sql="update UserInfo set DelFlag =1 where UserNum=?";
+			String[] params={userNum};
+			
+			int n = new DBOper().executeUpdate(sql, params);
+			
+			if(n>=1){
+				return "success";
+			}else{
+				return "error";
+			}
+		}
+
+		//条件查询员工信息
+		public ArrayList<UserInfo> QueryUserInfoByItem(String userNum, String userName, String gender) throws SQLException{
+			System.out.println("进入数据访问层 getAllStuInfo(成功");
+			
+			ArrayList<UserInfo> userInfoArr=new ArrayList<UserInfo>();
+			String sql="";
+			DBOper db = null;
+			ResultSet rst = null;
+			if(!userNum.equals("")&&userName.equals("")&&gender.equals("")){//查学号
+				sql = "select * from UserInfo where UserNum=? and delflag=0 order by UserNum";
+				String[] params = {userNum};
+				
+				rst =  new DBOper().executeQuery(sql,params);
+			}else if(!userName.equals("")&&userNum.equals("")&&gender.equals("")){//查姓名
+				sql = "select * from UserInfo where UserName=? and delflag=0 order by UserNum";
+				String[] params = {userName};
+				
+				rst = new DBOper().executeQuery(sql,params);
+			}else if(!gender.equals("")&&userNum.equals("")&&userName.equals("")){//查性别
+				sql = "select * from UserInfo where gender=? and delflag=0 order by UserNum";
+				String[] params = {gender};
+				
+				rst = new DBOper().executeQuery(sql,params);
+			}else if(!userName.equals("")&&userNum.equals("")&&!gender.equals("")){//查姓名、性别
+				sql = "select * from UserInfo where UserName=? and Gender=? and delflag=0 order by UserNum";
+				String[] params = {userName,gender};
+				
+				rst = new DBOper().executeQuery(sql,params);
+			}
+			
+			while(rst.next()){
+				    UserInfo userInfo = new UserInfo();
+					
+				    if(rst.getString(2) == null){
+				    	userInfo.UserNum="";
+					}else{
+						userInfo.UserNum=rst.getString(2);
+					}
+					if(rst.getString(4) == null){
+						userInfo.UserName="";
+					}else{
+						userInfo.UserName=rst.getString(4);
+					}
+					userInfo.Email=rst.getString(5);
+					userInfo.Phone=rst.getString(6);
+					userInfo.Gender=rst.getString(7);
+
+					userInfoArr.add(userInfo);
+				}
+			return userInfoArr;
+		}
+		
+		//更新员工信息
+		public String updateUserInfo(String oldUserNum, String newUserNum, String newUserName, String newGender, String newEmail, String newPhone){
+			System.out.println("进入数据访问层updateUserInfo(成功");
+			System.out.println(oldUserNum+newUserNum+newUserName+newGender+newEmail+newPhone);
+			String sql="update UserInfo set UserNum=?, UserName=?, Email=?, Phone=?, Gender=? where UserNum=?";
+			String[] params={newUserNum, newUserName, newEmail, newPhone, newGender, oldUserNum};
+			
+			int n = new DBOper().executeUpdate(sql, params);
+			
+			if(n>=1){
+				return "success";
+			}else{
+				return "error";
+			}
+		}
 }

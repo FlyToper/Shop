@@ -14,12 +14,10 @@
 
 <link href="./Public/css/bootstrap.min.css" rel="stylesheet"
 	type="text/css" />
-<link href="./Public/css/index.css" rel="stylesheet" type="text/css" />
-<link href="./Public/css/bootstrap.min.css" rel="stylesheet"
-	type="text/css">
 <link href="./Public/css/examAdmin.css" rel="stylesheet" type="text/css">
 <link href="./Public/css/stuinfo.css" rel="stylesheet" type="text/css">
 <link href="./Public/css/checkbox.css" rel="stylesheet" type="text/css">
+<link href="./Public/css/index.css" rel="stylesheet" type="text/css" />
 
 <style type="text/css">
 	body{
@@ -62,7 +60,7 @@
 		</div>
 		<!-- ãå¯¼èªå¼å§ã -->
 		<div>
-			<nav class="navbar navbar-default   mynav">
+			<nav class="navbar navbar-default  mynav" style="font-size:20px;">
 			<div class="container-fluid">
 				<!-- Brand and toggle get grouped for better mobile display -->
 				<div class="navbar-header">
@@ -87,7 +85,7 @@
 								class="sr-only">(current)</span></a></li>
 						<li id="mynavL3"><a
 							href="./HomeController?a=EnterGoodsExport">商品销售</a></li>
-						<li id="munavL5"><a href="./HomeController?a=GoodsBack"
+						<li id="munavL5"><a href="./HomeController?a=EnterGoodsBack"
 							target="_blank">退货处理</a></li>
 					</ul>
 
@@ -196,7 +194,7 @@
 				}
 			%>
 			<div id="<%=div_sale%>" class="col-sm-2 col-md-3 mycol">
-				<a href="javascript:void(0);" onclick="sale(<%=i%>)">采购</a> |
+				<a style="color:#990066;" href="javascript:void(0);" onclick="ToImport('<%=g.GoodsNum %>','<%=g.GoodsName %>', '<%=g.CateName %>#<%=g.CateId %>','<%=g.Price%>', '<%=g.TotalNumber%>','<%=g.IsSale%>')"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> 采购</a> |
 				<%
 					if (g.IsSale == 0) {
 				%>
@@ -263,7 +261,7 @@
 			%>
 
 			<div id="<%=div_sale%>" class="col-sm-2 col-md-3 mycol">
-				<a href="javascript:void(0);" onclick="sale(<%=i%>)">采购</a> |
+				<a style="color:#990066;" href="javascript:void(0);" onclick="ToImport('<%=g.GoodsNum %>','<%=g.GoodsName %>', '<%=g.CateName %>#<%=g.CateId %>','<%=g.Price%>', '<%=g.TotalNumber%>','<%=g.IsSale%>')"><span class="glyphicon glyphicon-shopping-cart" aria-hidden="true"></span> 采购</a> |
 				<%
 					if (g.IsSale == 0) {
 				%>
@@ -334,7 +332,7 @@
 							aria-label="Close">
 							<span aria-hidden="true">&times;</span>
 						</button>
-						<h4 class="modal-title" id="exampleModalLabel">新增商品</h4>
+						<h4 class="modal-title" id="ModalLabel">新增商品</h4>
 					</div>
 					<div class="modal-body">
 						<form>
@@ -360,7 +358,7 @@
 							<hr>
 							
 							<div class="form-group"><!-- 【选择供货商开始】 -->
-								<label for="txtNewRemark" class="control-label">供货商（选填）：</label> 
+								<label for="selProviderName" class="control-label">供货商（选填）：</label> 
 								<select style="border-radius:6px;" id="selProviderName" onchange="ShowImportInfo()">
 									<option value="0">请选择</option>
 									<%for(int k =0;k < proInfoArr.size();k++) { ProviderInfo p = proInfoArr.get(k); %><option  value="<%=p.ProvideName%>#<%=p.id %>"><%=p.ProvideName %></option><%} %>
@@ -372,7 +370,7 @@
 								<input type="text" style="border-radius:6px;width:80px;padding:6px 12px;height: 34px;" id="txtNewTotalNumber" value="0" >
 								&nbsp;&nbsp;
 								<label for="txtNewPrice" class="control-label">进货价格：</label> 
-								<input type="text" style="border-radius:6px;width:80px;padding:6px 12px;height: 34px;" id="txtNewTotalNumber" >
+								<input type="text" style="border-radius:6px;width:80px;padding:6px 12px;height: 34px;" id="txtNewPrice" >
 							</div><!-- 【选择供货商结束】 -->
 							
 							<div class="form-group">
@@ -385,13 +383,15 @@
 					</div>
 					<div class="modal-footer">
 						<span id="msgNewGoodsInfo"></span>
-						<span onclick="CancelNewGoodsInfo()"><button type="button" class="btn btn-default" data-dismiss="modal" >取消</button></span> 
-						<button type="button" class="btn btn-primary" onclick="SaveNewGoodsInfo()">保存</button>
+						<span onclick="CancelNewGoodsInfo()"><button type="button" class="btn btn-default" data-dismiss="modal" >取消</button></span>
+						<span id="span_btnSave"><button type="button" class="btn btn-primary" onclick="SaveNewGoodsInfo()">保存</button></span> 
+						
 					</div>
 				</div>
 			</div>
 		</div>
 	</div>
+	<input type="hidden" id="myGoodsNum" value="">
 	<!-- 【采购页面】 -->
 
 	<!-- 【新增商品页面】 -->
@@ -503,7 +503,8 @@
 		
 		//商品新增
 		function myAddGoods(){
-			$("#btnAddGoods").click();
+			
+			ShowByType("Add");
 		}
 		
 		//商品类型新增

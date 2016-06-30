@@ -39,11 +39,11 @@ public class GoodsInfo {
 
 
 	//查询所有商品信息
-	public ArrayList<GoodsInfo> getAllGoodsInfo() throws SQLException{
+	public ArrayList<GoodsInfo> getAllGoodsInfo(String sql) throws SQLException{
 		System.out.println("进入数据访问层getAllGoodsInfo()成功");
 		ArrayList<GoodsInfo> goodsInfoArr=new ArrayList<GoodsInfo>();
 	
-		String sql = "select * from GoodsInfo where DelFlag =0 order by GoodsNum desc";
+		
 		String params[]={};
 		
 		ResultSet rst = new DBOper().executeQuery(sql,params);
@@ -125,5 +125,144 @@ public class GoodsInfo {
 		return newGoodsNum;
 		
 	}
+	
+	
+	//商品采购更新的几个属性
+	public int UpdateGodosInfoAsBuy(String goodsnum,int price, int issale,int totalnumber){
+		String sql = "Update goodsinfo set Price = ?, IsSale = ?, TotalNumber = TotalNumber + "+totalnumber+"  where GoodsNum = ?";
+		String params[] = {String.valueOf(price)  ,String.valueOf(issale) ,goodsnum };
+		
+		DBOper db = new DBOper();
+		return db.executeUpdate(sql, params);		
+	}
+	
+	//商品销售
+	public int UpdateGoodsInfoAsSale(String goodsnum,int salenumber){
+		//Update goodsinfo set TotalNumber = TotalNumber - 1, SaleNumber = SaleNumber + 1  where GoodsNum = 'G1005';
+		System.out.print("salenumber:"+salenumber);
+		String sql = "Update goodsinfo set TotalNumber = TotalNumber - "+salenumber+", SaleNumber = SaleNumber + "+salenumber+"  where GoodsNum = ?";
+		String params[] = {goodsnum};
+		
+		DBOper db = new DBOper();
+		return db.executeUpdate(sql, params);	
+	}
+	
+	//查询所有商品信息
+		public ArrayList<GoodsInfo> getAllGoodsInfo() throws SQLException{
+			System.out.println("进入数据访问层getAllGoodsInfo()成功");
+			ArrayList<GoodsInfo> goodsInfoArr=new ArrayList<GoodsInfo>();
+		
+			String sql = "select * from GoodsInfo where DelFlag =0";
+			String params[]={};
+			
+			ResultSet rst = new DBOper().executeQuery(sql,params);
+			
+			while(rst.next()){
+				GoodsInfo goodsInfo = new GoodsInfo();
+				
+				goodsInfo.GoodsNum=rst.getString(2);
+				goodsInfo.GoodsName=rst.getString(3);
+				goodsInfo.CateId=rst.getInt(4);
+				goodsInfo.CateName=rst.getString(5);
+				goodsInfo.Price=rst.getInt(6);
+				goodsInfo.TotalNumber=rst.getInt(7);
+				goodsInfo.SaleNumber=rst.getInt(8);
+				goodsInfo.SubTime=rst.getTimestamp(9);
+				goodsInfo.DelFlag=rst.getInt(10);
+				goodsInfo.State=rst.getString(11);
+				if(rst.getString(12)!=null){
+					goodsInfo.Remark=rst.getString(12);
+				}else{
+					goodsInfo.Remark="";
+				}
+				goodsInfoArr.add(goodsInfo);
+			}
+			return goodsInfoArr;
+		}
+		
+		//条件查询商品信息
+		public ArrayList<GoodsInfo> QueryGoodsInfoByItem(String goodsNum, String goodsName, String cateName) throws SQLException{
+			System.out.println("进入数据访问层 QueryGoodsInfoByItem(成功");
+			
+			ArrayList<GoodsInfo> goodsInfoArr=new ArrayList<GoodsInfo>();
+			String sql="";
+			DBOper db = null;
+			ResultSet rst = null;
+			
+			if(!goodsNum.equals("")&&goodsName.equals("")&&cateName.equals("")){//查商品编号
+				sql = "select * from GoodsInfo where GoodsNum=? and delflag=0 order by GoodsNum";
+				String[] params = {goodsNum};
+				
+				rst =  new DBOper().executeQuery(sql,params);
+			}else if(!goodsName.equals("")&&goodsNum.equals("")&&cateName.equals("")){//查商品名
+				sql = "select * from GoodsInfo where GoodsName=? and delflag=0 order by GoodsNum";
+				String[] params = {goodsName};
+				
+				rst = new DBOper().executeQuery(sql,params);
+			}else if(!cateName.equals("")&&goodsNum.equals("")&&goodsName.equals("")){//查商品类型
+				sql = "select * from GoodsInfo where CateName=? and delflag=0 order by GoodsNum";
+				String[] params = {cateName};
+				
+				rst = new DBOper().executeQuery(sql,params);
+			}else if(!goodsName.equals("")&&goodsNum.equals("")&&!cateName.equals("")){//查姓名、性别
+				sql = "select * from UserInfo where UserName=? and Gender=? and delflag=0 order by UserNum";
+				String[] params = {goodsName,cateName};
+				
+				rst = new DBOper().executeQuery(sql,params);
+			}
+			
+			while(rst.next()){
+				    GoodsInfo goodsInfo = new GoodsInfo();
+					
+				    if(rst.getString(2) == null){
+				    	goodsInfo.GoodsNum="";
+					}else{
+						goodsInfo.GoodsNum=rst.getString(2);
+					}
+					if(rst.getString(3) == null){
+						goodsInfo.GoodsName="";
+					}else{
+						goodsInfo.GoodsName=rst.getString(3);
+					}
+					goodsInfo.CateName=rst.getString(5);
+					goodsInfo.Price=rst.getInt(6);
+					goodsInfo.TotalNumber=rst.getInt(7);
+					goodsInfo.SaleNumber=rst.getInt(7);
+
+					goodsInfoArr.add(goodsInfo);
+				}
+			return goodsInfoArr;
+		}
+		
+		//删除商品信息
+		public String deleteGoodsInfo(String goodsNum){
+			System.out.println("进入数据访问层deleteGoodsInfo(成功");
+			String sql="update GoodsInfo set DelFlag =1 where GoodsNum=?";
+			String[] params={goodsNum};
+			
+			int n = new DBOper().executeUpdate(sql, params);
+			
+			if(n>=1){
+				return "success";
+			}else{
+				return "error";
+			}
+		}
+		
+		public String updateGoodsInfo(String oldGoodsNum, String newGoodsNum, String newGoodsName, String newCateName, String newPrice, String newTotalNumber, String newSaleNumber ){
+			System.out.println("进入数据访问层updateGoodsInfo(成功");
+			System.out.println(oldGoodsNum+ newGoodsNum+newCateName+newPrice+newTotalNumber+newSaleNumber);
+			String sql="update GoodsInfo set GoodsNum=?, GoodsName=?, CateName=?, Price=?, TotalNumber=?, SaleNumber=? where GoodsNum=?";
+			String[] params={newGoodsNum, newGoodsName, newCateName, newPrice, newTotalNumber, newSaleNumber,oldGoodsNum};
+			
+			int n = new DBOper().executeUpdate(sql, params);
+			
+			if(n>=1){
+				return "success";
+			}else{
+				return "error";
+			}
+		}
+
 
 }

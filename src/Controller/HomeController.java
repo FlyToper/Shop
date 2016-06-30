@@ -136,10 +136,15 @@ public class HomeController extends Controller {
 				// TODO 自动生成的 catch 块
 				e.printStackTrace();
 			}
-		} else if (action.equals("GoodsBack") && IsLogin()) {
-
+		} else if (action.equals("EnterGoodsBack") && IsLogin()) {
+			//进入退货页面
 			// System.out.print("2222222222222");
-			goodsBackAction();
+			try {
+				GoodsBackAction();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} else if (action.equals("UpToSale") && IsLogin()) {
 			// 调用商品上架
 			UpToSaleAction();
@@ -177,6 +182,24 @@ public class HomeController extends Controller {
 		String categoryAndIds[] = categoryAndId.split("#"); 
 		String id = categoryAndIds[1];
 		String category = categoryAndIds[0];
+		String isSale = myRequest.getParameter("newIsSale");
+		String goodsnum = myRequest.getParameter("goodsnum");
+		
+		//供应商的部分信息
+		String providerNameAndId = myRequest.getParameter("providerName");
+		String pName = "";
+		int pId = 0;
+		int newTotalNumber = 0;
+		int price = 0;
+		if(!providerNameAndId.equals("0")){
+			newTotalNumber = Integer.parseInt(myRequest.getParameter("newTotalNumber"));
+			price = Integer.parseInt(myRequest.getParameter("price"));
+			
+			//截取供应商名字和编号
+			String providerNameAndIds[] = providerNameAndId.split("#");
+			pName = providerNameAndIds[0];
+			pId = Integer.parseInt(providerNameAndIds[1]);
+		}
 		
 		
 		String salePrice = myRequest.getParameter("newSalePrice");
@@ -185,7 +208,7 @@ public class HomeController extends Controller {
 		//System.out.print("id="+id+", categoryname="+category);
 		
 		
-	
+		//填充商品信息表，执行插入操作
 		GoodsInfo goods = new GoodsInfo();
 		goods.CateId = Integer.parseInt(id);
 		goods.CateName = category;
@@ -193,20 +216,70 @@ public class HomeController extends Controller {
 		goods.GoodsName = goodsName;
 		goods.IsSale = 0;
 		goods.Price = Integer.parseInt(salePrice);
-		goods.TotalNumber = 0;
+		goods.TotalNumber = newTotalNumber;
 		goods.SaleNumber = 0;
-		goods.IsSale = 0;
+		goods.IsSale = Integer.parseInt(isSale);
 		goods.State = "正常";
 		
 		goods.GoodsNum = goods.getNewGoodsNum();
 		
-		//执行插入操作
-		int rst = goods.AddNewGoodsInfo(goods);
-		if(rst > 0){
-			myResponse.getWriter().print("success");
+		
+		
+		
+		//判断是采购还是新增
+		String type = myRequest.getParameter("type");
+		if(providerNameAndId.equals("0")){
+			//执行插入操作
+			if(type.equals("1")){//采购
+				myResponse.getWriter().print("error");
+			}else{
+			
+				int rst = goods.AddNewGoodsInfo(goods);
+				if(rst > 0){
+					myResponse.getWriter().print("success");
+				}else{
+					myResponse.getWriter().print("error1");
+				}
+			}
 		}else{
-			myResponse.getWriter().print("error");
+			
+			//判断是采购还是新增
+			int rst = 0;
+			if(type.equals("1")){//采购
+				if(!goodsnum.equals("")){
+					rst = goods.UpdateGodosInfoAsBuy(goodsnum, goods.Price, goods.IsSale, goods.TotalNumber);
+				}else{
+					myResponse.getWriter().print("error");
+				}
+				
+			}else{//新增
+				rst = goods.AddNewGoodsInfo(goods);
+			}
+
+		
+			if(rst > 0){
+				//填充进货信息
+				ImportInfo importinfo = new ImportInfo();
+				importinfo.GoodsNum = goods.GoodsNum;
+				importinfo.GoodsName = goodsName;
+				importinfo.ProviderId = pId;
+				importinfo.ProviderName = pName;
+				importinfo.Number = newTotalNumber;
+				importinfo.Price = price;
+				importinfo.UserNum = mySession.getAttribute("username").toString();
+				importinfo.UserName = mySession.getAttribute("truename").toString();
+				
+				int rst2 = importinfo.AddImportInfo(importinfo);
+				if(rst2 > 0){
+					myResponse.getWriter().print("success");
+				}else{
+					myResponse.getWriter().print("error2");
+				}
+			}else{
+				myResponse.getWriter().print("error3");
+			}
 		}
+		
 		//myResponse.getWriter().print(goods.getNewGoodsNum()) ;
 		
 	}
@@ -318,9 +391,14 @@ public class HomeController extends Controller {
 	}
 
 	// 退货处理
-	public void goodsBackAction() throws ServletException, IOException {
-		// 跳转到员工主页
-		RequestDispatcher dispatcher = myRequest.getRequestDispatcher("WEB-INF/View/goodsBack.jsp");
+	public void GoodsBackAction() throws ServletException, IOException, SQLException {
+		// 跳转到退货处理页面
+		//反馈订单信息
+		ArrayList<ExportInfo> exportInfoArr = new ExportInfo().getAllExportInfo();
+		myRequest.setAttribute("exportInfoArr", exportInfoArr);
+		
+		
+		RequestDispatcher dispatcher = myRequest.getRequestDispatcher("WEB-INF/View/Home/GoodsBack.jsp");
 		dispatcher.forward(myRequest, myResponse);
 	}
 
@@ -335,6 +413,7 @@ public class HomeController extends Controller {
 
 		if (rst == "success") {
 			mySession.setAttribute("username", username);
+			mySession.setAttribute("usertype", "user");
 
 			myResponse.getWriter().print("success");
 		} else {
@@ -344,10 +423,10 @@ public class HomeController extends Controller {
 
 	// 通过查看session中的username是否为空，检查用户是否登陆
 	public Boolean IsLogin() {
-		if (mySession.getAttribute("username") == null) {
-			return false;
-		} else {
+		if (mySession.getAttribute("username") != null && mySession.getAttribute("usertype") != null && mySession.getAttribute("usertype").toString().equals("user")) {
 			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -402,36 +481,42 @@ public class HomeController extends Controller {
 	// 进入商品销售页面Action
 	public void EnterGoodsExportAction() throws ServletException, IOException, SQLException {
 		//System.out.print("进入EnterGoodsExportAction()成功！");
-		ArrayList<GoodsInfo> goodsInfoArr = new GoodsInfo().getAllGoodsInfo();
-		
+		String sql = "select * from GoodsInfo where DelFlag =0 and IsSale = 1 order by GoodsNum desc";
+		ArrayList<GoodsInfo> goodsInfoArr = new GoodsInfo().getAllGoodsInfo(sql);
+		//获取商品类型列表
+		ArrayList<CategoryInfo> cateInfoArr = new CategoryInfo().getAllCategoryInfo();
 		//System.out.println("数据访问成功，返回");
 		myRequest.setAttribute("goodsInfoArr", goodsInfoArr);
+		myRequest.setAttribute("cateInfoArr", cateInfoArr);
 		
 		
 		
 		// 跳转到商品销售页
-		RequestDispatcher dispatcher = myRequest.getRequestDispatcher("WEB-INF/View/goodsExport123.jsp");
+		RequestDispatcher dispatcher = myRequest.getRequestDispatcher("WEB-INF/View/Home/GoodsExport.jsp");
 		dispatcher.forward(myRequest, myResponse);
 	}
 
 	// 购买商品Action
-	public void SaleGoodsAction() {
+	public void SaleGoodsAction() throws IOException {
 		System.out.println("进入SaleGoodsAction()成功！");
 
-		String goodsNum = myRequest.getParameter("goodsNum");
-		String goodsName = myRequest.getParameter("goodsName");
-		String number = myRequest.getParameter("saleNumber");
+		String goodsNum = myRequest.getParameter("goodsnum");
+		String goodsName = myRequest.getParameter("goodsname");
+		String number = myRequest.getParameter("salenumber");
 		String price = myRequest.getParameter("price");
 		String userNum = (String) mySession.getAttribute("username");
 		String userName = (String) mySession.getAttribute("truename");
 
-		String rst = new ExportInfo().SaleGoods(userNum, userName, goodsNum, goodsName, number, price);
-		System.out.println("数据访问成功，返回");
-		try {
-			myResponse.getWriter().print(rst);
-		} catch (IOException e) {
-			// TODO 自动生成的 catch 块
-			e.printStackTrace();
+		int rst1 = new GoodsInfo().UpdateGoodsInfoAsSale(goodsNum, Integer.valueOf(number));
+		if(rst1 > 0){
+			int rst2 = new ExportInfo().SaleGoods(userNum, userName, goodsNum, goodsName, number, price);
+			if(rst2 > 0){
+				myResponse.getWriter().print("success");
+			}else{
+				myResponse.getWriter().print("error2");
+			}
+		}else{
+			myResponse.getWriter().print("error1");
 		}
 	}
 
@@ -513,8 +598,9 @@ public class HomeController extends Controller {
 
 	// 进入入货页面Action
 	public void EnterGoodsImportAction() throws SQLException, ServletException, IOException {
+		String sql = "select * from GoodsInfo where DelFlag =0  order by GoodsNum desc";
 		//获取商品列表
-		ArrayList<GoodsInfo> goodsInfoArr = new GoodsInfo().getAllGoodsInfo();
+		ArrayList<GoodsInfo> goodsInfoArr = new GoodsInfo().getAllGoodsInfo(sql);
 		//获取商品类型列表
 		ArrayList<CategoryInfo> cateInfoArr = new CategoryInfo().getAllCategoryInfo();
 		//获取提供商列表

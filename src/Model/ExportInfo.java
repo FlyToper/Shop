@@ -3,6 +3,7 @@ package Model;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 import Core.DBOper;
 
@@ -21,7 +22,7 @@ public class ExportInfo {
 	public String Remark;
 
 	//商品销售处理方法
-	public String SaleGoods(String userNum,String userName,String goodsNum,String goodsName,String number,String price){
+	public int SaleGoods(String userNum,String userName,String goodsNum,String goodsName,String number,String price){
 		System.out.println("进入数据访问层SaleGoods()成功");
 		
 		String sql = "insert into ExportInfo(GoodsNum,GoodsName,Number,Price,UserNum,UserName) values(?,?,?,?,?,?)";
@@ -31,12 +32,8 @@ public class ExportInfo {
 		sql = "update GoodsInfo set TotalNumber=TotalNumber-?, SaleNumber=SaleNumber+? where GoodsNum=?";
 		String params1[]={number, number, goodsNum};
 		
-		n = new DBOper().executeUpdate(sql, params1);
-		if(n>=1){
-			return "success";
-		}else{
-			return "error";
-		}
+		return  new DBOper().executeUpdate(sql, params1);
+		
 		
 		
 	}
@@ -75,4 +72,41 @@ public class ExportInfo {
 		}
 		return exportInfo;
     }
+    
+    
+    //查询所有订单信息
+    public ArrayList<ExportInfo> getAllExportInfo() throws SQLException{
+    	String sql = "select * from exportinfo where DelFlag = 0";
+    	String params[] = {};
+    	
+    	DBOper db = new DBOper();
+    	ArrayList<ExportInfo> list = new ArrayList<ExportInfo>();
+    	ExportInfo exportInfo;
+    	
+    	ResultSet rst = db.executeQuery(sql, params);
+    	while(rst.next()){
+    		exportInfo = new ExportInfo();
+    		exportInfo.Id=rst.getInt(1);
+			exportInfo.GoodsNum=rst.getString(2);
+			exportInfo.GoodsName=rst.getString(3);
+			exportInfo.Number=rst.getInt(4);
+			exportInfo.Price=rst.getInt(5);
+			exportInfo.UserNum=rst.getString(6);
+			exportInfo.UserName=rst.getString(7);
+			exportInfo.SubTime=rst.getTimestamp(8);
+			exportInfo.DelFlag=rst.getInt(9);
+			exportInfo.State=rst.getString(10);
+			exportInfo.Remark=rst.getString(11);
+			
+			list.add(exportInfo);
+    	}
+    	
+    	return list;
+    	
+    }
+    
+    
+    
+    
+    
 }
