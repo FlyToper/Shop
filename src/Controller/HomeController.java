@@ -168,11 +168,59 @@ public class HomeController extends Controller {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}else if(action.equals("EnterSubBackInfo") && IsLogin()){
+			//进入填写退货信息页面
+			EnterSubBackInfoAction();
+		
+		}else if(action.equals("InsertBackInfo") && IsLogin()){
+			//插入退货信息
+			InsertBackInfoAction();
+		
 		} else {
 			// 【用户还没有登录直接进来，跳转登录页面】
 			response.sendRedirect("./login.html");
 
 		}
+	}
+	
+	//执行插入退货信息
+	public void InsertBackInfoAction() throws IOException{
+		String exportId = myRequest.getParameter("id");
+		String goodsNum = myRequest.getParameter("goodsNum");
+		String goodsName = myRequest.getParameter("goodsName");
+		String custName = myRequest.getParameter("custName");
+		String custPhone = myRequest.getParameter("custPhone");
+		String description = myRequest.getParameter("description");
+		
+		int rst1 = new ExportInfo().updateStateAsBack(Integer.valueOf(exportId) , "退货");
+		if(rst1 > 0){
+			int rst2 = new BackInfo().SaleBack2(exportId, goodsNum, goodsName, custName, custPhone, description, mySession.getAttribute("username").toString(), mySession.getAttribute("truename").toString());
+			
+			if(rst2 > 0){
+				myResponse.getWriter().print("success");
+			}else{
+				myResponse.getWriter().print("error2");
+			}
+			
+		}else{
+			myResponse.getWriter().print("error3");
+		}
+		
+		
+	}
+	
+	
+	
+	//进入退货信息登记页面
+	public void EnterSubBackInfoAction() throws ServletException, IOException{
+		String id = myRequest.getParameter("exportId");
+		
+		ExportInfo exportInfo = new ExportInfo().QueryExportInfoByExportId(id);
+		myRequest.setAttribute("exportInfo", exportInfo);
+		
+		
+		RequestDispatcher dispatcher = myRequest.getRequestDispatcher("WEB-INF/View/Home/SubBackInfo.jsp");
+		dispatcher.forward(myRequest, myResponse);
 	}
 	
 	//新增商品信息

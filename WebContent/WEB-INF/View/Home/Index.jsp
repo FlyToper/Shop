@@ -87,7 +87,7 @@
 						<li id="mynavL3"><a
 							href="./HomeController?a=EnterGoodsExport" >商品销售</a></li>
 						<li id="munavL5"><a href="./HomeController?a=EnterGoodsBack"
-							>退货处理</a></li>
+							>订单和退货</a></li>
 					</ul>
 
 					<ul class="nav navbar-nav navbar-right">

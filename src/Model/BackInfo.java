@@ -35,4 +35,15 @@ public class BackInfo {
 			return "error";
 		}
 	}
+	
+	//员工退货方法2
+	public int SaleBack2(String exportId, String goodsNum, String goodsName, String customerName, String customerPhone, String description, String userNum, String userName){
+        System.out.println("进入数据访问层SaleBack()成功");
+		
+		String sql = "insert into BackInfo(ExportId, GoodsNum, GoodsName, CustomerName, CustomerPhone, Description, UserNum,UserName) values(?,?,?,?,?,?,?,?)";
+		String params[]={exportId, goodsNum, goodsName, customerName, customerPhone, description, userNum, userName};
+		return  new DBOper().executeUpdate(sql, params);
+		
+		
+	}
 }

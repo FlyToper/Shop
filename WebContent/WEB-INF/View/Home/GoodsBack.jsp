@@ -77,15 +77,15 @@
 					<ul class="nav navbar-nav" id="mynavUl">
 						<li id="mynavL1"><a href="./HomeController">个人信息</span>
 						</a></li>
-						<li id="mynavL2"><a href="javascript:void(0);"
-							onclick="changeDIV();">修改密码</a></li>
+						<li id="mynavL2"><a href="./HomeController?a=UpdatePwd"
+							>修改密码</a></li>
 						<li id="munavL4"><a
 							href="./HomeController?a=EnterGoodsImport" >商品采购</a>
 						</li>
 						<li id="mynavL3"><a
 							href="./HomeController?a=EnterGoodsExport" >商品销售</a></li>
 						<li class="active"  id="munavL5"><a href="javascript:void(0)"
-							>退货处理<span class="sr-only">(current)</a></li>
+							>订单和退货<span class="sr-only">(current)</a></li>
 					</ul>
 
 					<ul class="nav navbar-nav navbar-right">
@@ -145,7 +145,8 @@
 				<div class="col-sm-2 col-md-2 mycol myheaderlabel">购买数量</div>
 				<div class="col-sm-2 col-md-2 mycol myheaderlabel">商品单价</div>
 				<div class="col-sm-2 col-md-2 mycol myheaderlabel">商品总额</div>
-				<div class="col-sm-2 col-md-3 mylastcol myheaderlabel">操作</div>
+				<div class="col-sm-2 col-md-1  mycol myheaderlabel">当前状态</div>
+				<div class="col-sm-2 col-md-2 mylastcol myheaderlabel">操作</div>
 			</div>
 			<%
 				for (int i = 0; i < exportInfoArr.size(); i++) {
@@ -162,12 +163,13 @@
 				<div class="col-sm-2 col-md-2 mycol"><%=e.Number%></div>
 				<div class="col-sm-1 col-md-2 mycol"><%=e.Price%></div>
 				<div class="col-sm-1 col-md-2 mycol"><%=e.Number*e.Price%></div>
-				<div class="col-sm-2 col-md-3 mycol">操作</div>
-
-
-
-				
-
+				<%if(e.State.equals("正常")){ %>
+					<div class="col-sm-2 col-md-1 mycol "><%=e.State %></div>
+					<div class="col-sm-2 col-md-2 mycol"><a style="color:#990066" href="./HomeController?a=EnterSubBackInfo&exportId=<%=e.Id %>" target="_blank"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 退货登记</a></div>
+				<%}else{ %>
+					<div  class="col-sm-2 col-md-1 mycol "><span style="color:red;"> <%=e.State %></span></div>
+					<div class="col-sm-2 col-md-2 mycol">不可操作</div>
+				<%} %>
 			</div>
 
 			<%
@@ -179,7 +181,13 @@
 				<div class="col-sm-2 col-md-2 mycol"><%=e.Number%></div>
 				<div class="col-sm-1 col-md-2 mycol"><%=e.Price%></div>
 				<div class="col-sm-1 col-md-2 mycol"><%=e.Number*e.Price%></div>
-				<div class="col-sm-2 col-md-3 mycol">操作</div>
+				<%if(e.State.equals("正常")){ %>
+					<div class="col-sm-2 col-md-1 mycol "><%=e.State %></div>
+					<div class="col-sm-2 col-md-2 mycol"><a style="color:#990066" href="./HomeController?a=EnterSubBackInfo&exportId=<%=e.Id %>" target="_blank"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span> 退货登记</a></div>
+				<%}else{ %>
+					<div  class="col-sm-2 col-md-1 mycol "><span style="color:red;"> <%=e.State %></span></div>
+					<div class="col-sm-2 col-md-2 mycol">不可操作</div>
+				<%} %>
 			</div>
 			<%
 				}
@@ -189,7 +197,62 @@
 		<!-- 【列表信息】 -->
 		
 		<!-- 【个人信息开始】 -->
+		<div>
+		<!-- 【购买弹出框开始】 -->
+		<button id="btnSubBackInfo" style="display:none" type="button" class="btn btn-primary" data-toggle="modal"
+			data-target="#exampleModal" data-whatever="@mdo">Open modal
+			for @mdo</button>
+		
 
+		<div class="modal fade" id="exampleModal" tabindex="1" role="dialog"
+			aria-labelledby="exampleModalLabel">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title" id="exampleModalLabel">商品销售</h4>
+					</div>
+					<div class="modal-body">
+							<div class="form-group">
+								<label for="txtGoodsName" class="control-label">商品名称：</label>
+								<input style="font-size:15px;" type="text" class="form-control" id="txtGoodsName">
+							</div>
+							<div class="form-group">
+								<label for="selCategory" class="control-label">分类：</label>
+								<select style="border-radius:6px;" id="selCategory">
+									<option id="0" value="0">请选择</option>
+									
+								</select>
+								&nbsp;&nbsp;&nbsp;&nbsp;
+								<label for="txtTotalNumber" class="control-label">剩余商品数：</label>
+								<input  type="text" style="font-size:14px; border-radius:6px;padding:6px 12px;height: 34px;width:100px;" id="txtTotalNumber" placeholder="请输入..." >
+							</div>
+							<div class="form-group">
+								<label for="txtSalePrice" class="control-label">出售价格：</label>
+								<input  type="text" style="font-size:14px; border-radius:6px;padding:6px 12px;height: 34px;width:100px;" id="txtSalePrice" placeholder="请输入..." >
+								&nbsp;&nbsp;&nbsp;&nbsp;
+								<label for="txtSaleNumber" class="control-label">购买数量：</label>
+								<input id="txtSaleNumber" type="text" style="font-size:14px; border-radius:6px;padding:6px 12px;height: 34px;width:100px;" id="txtNewSalePrice" placeholder="请输入..." >
+							</div>
+							<div class="form-group" id="div_totalMoney" style="display: none">
+								<label style="color:#990066" for="totalMoney" class="control-label">当前消费总额为：</label>
+								<span style="color:#999933" id="totalMoney"></span>
+							</div>
+							
+					</div>
+					<div class="modal-footer">
+						<span id="msgToSale"></span>
+						<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+						<button type="button" class="btn btn-primary" onclick="SureToBuy()">确定购买</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- 【购买弹出框开始】 -->
 		
 
 	</div>
@@ -202,7 +265,7 @@
 	<div>
 		<!-- 【尾部部分结束】 -->
 		<!-- Button trigger modal -->
-		<button style="display: none;" type="button"
+		<button id="btnHelpLink" style="display: none;" type="button"
 			class="btn btn-primary btn-lg" data-toggle="modal"
 			data-target="#myModal">Launch demo modal</button>
 
@@ -255,7 +318,11 @@
 	<script type="text/javascript" src="./Public/js/staff.js"></script>
 	<script type="text/javascript">
 		function myHelpLink() {
-			$(".btn-primary").click();
+			$("#btnHelpLink").click();
+		}
+		
+		function showSubBackInfo(){
+			$("#btnSubBackInfo").click();
 		}
 	</script>
 

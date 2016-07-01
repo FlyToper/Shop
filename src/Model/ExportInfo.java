@@ -105,7 +105,14 @@ public class ExportInfo {
     	
     }
     
-    
+    //退货处理，更新状态
+    public int updateStateAsBack(int cateId, String state){
+    	String sql = "Update exportinfo set State = ? where Id = "+cateId;
+    	String[] params = { state};
+    	
+    	DBOper db = new DBOper();
+    	return db.executeUpdate(sql, params);
+    }
     
     
     

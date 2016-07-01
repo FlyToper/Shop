@@ -213,7 +213,7 @@ function addStuInfo(){
 //查询所有员工并于网页上排列
 function queryAllUserInfo(){
 	$.post("./AdminController", {"a":"QueryAllUserInfo"}, function(rst){
-		alert(rst);
+		//alert(rst);
 		var obj = JSON.parse(rst);
 
 		var showInfodiv = $("#showInfodiv");
@@ -284,7 +284,7 @@ function queryUserInfobyitem(){
 	}else{
 		$.post("./AdminController", {"txtUserNum":txtUserNum, "txtUserName":txtUserName, "txtGender":txtGender, "a":"QueryUserInfoByItem"}, function(rst){
 			if(rst!=null){
-				alert(rst);
+				//alert(rst);
 				var obj = JSON.parse(rst);
 
 				var showInfodiv = $("#showInfodiv");
@@ -394,7 +394,7 @@ function deleteUserInfo(userNumId, showInfodivId){
 //查询所有商品信息并显示出来
 function queryAllGoodsInfo(){
 	$.post("./AdminController", {"a":"QueryAllGoodsInfo"}, function(rst){
-		alert(rst);
+		//alert(rst);
 		var obj = JSON.parse(rst);
 		
 		var showInfodiv2 = $("#showInfodiv2");
